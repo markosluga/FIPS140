@@ -1,5 +1,4 @@
 -- Field-level encryption module for NGINX
--- Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 6.1, 6.2, 6.3, 6.4, 8.1, 8.5
 
 local cjson = require "cjson"
 local http = require "resty.http"
