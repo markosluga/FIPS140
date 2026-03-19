@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIPS-140 Level 3 encryption is just an API call away!</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 FIPS-140 Level 3 encryption is just an API call away!</h1>
+
+        <!-- Phase 1: Encrypt -->
+        <div class="phase-block">
+            <div class="phase-header phase-1-header">Phase 1 — Encrypt</div>
+            <div class="section">
+                <h2>Enter Credit Card Number</h2>
+                <form id="encrypt-form">
+                    <div class="form-group">
+                        <label>Credit Card Number:</label>
+                        <input type="text" id="credit_card" placeholder="4532-1234-5678-9010" required>
+                    </div>
+                    <button type="submit">🔒 Encrypt via KMS</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>Encryption Flow</h2>
+                <div class="flow-diagram">
+                    <div class="step" id="enc-step-1">1. Request Sent</div>
+                    <div class="arrow">→</div>
+                    <div class="step" id="enc-step-2">2. KMS Encrypt</div>
+                    <div class="arrow">→</div>
+                    <div class="step" id="enc-step-3">3. Stored Encrypted</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Encryption Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>KMS Endpoint</h3>
+                        <code id="enc-kms-endpoint">-</code>
+                    </div>
+                    <div class="metric-card">
+                        <h3>KMS Key ID</h3>
+                        <code id="enc-kms-key">-</code>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Encryption Time</h3>
+                        <span id="enc-time" class="metric-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Data</h2>
+                <div class="data-grid">
+                    <div class="data-card">
+                        <h3>Original (plaintext)</h3>
+                        <pre id="original-data">Submit form to see data...</pre>
+                    </div>
+                    <div class="data-card">
+                        <h3>Encrypted (sent to backend)</h3>
+                        <pre id="encrypted-data">Submit form to see data...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Flush -->
+        <div class="flush-block">
+            <div class="flush-label">🔑 Key Cache Flush</div>
+            <p class="flush-desc">Flush the KMS data key cache so the next operation must re-request keys from AWS KMS.</p>
+            <button id="flush-btn" class="flush-btn" disabled>Flush Key Cache</button>
+            <div id="flush-status" class="flush-status"></div>
+        </div>
+
+        <!-- Phase 2: Decrypt -->
+        <div class="phase-block" id="phase2-block">
+            <div class="phase-header phase-2-header">Phase 2 — Decrypt</div>
+            <div class="section">
+                <h2>Decrypt Stored Data</h2>
+                <p class="phase2-desc">The ciphertext below was stored by the backend. Click decrypt to retrieve the plaintext via KMS.</p>
+                <div class="form-group">
+                    <label>Ciphertext (from backend):</label>
+                    <textarea id="ciphertext-input" rows="4" placeholder="Complete Phase 1 first..." readonly></textarea>
+                </div>
+                <button id="decrypt-btn" disabled>🔓 Decrypt via KMS</button>
+            </div>
+
+            <div class="section">
+                <h2>Decryption Flow</h2>
+                <div class="flow-diagram">
+                    <div class="step" id="dec-step-1">1. Fetch Ciphertext</div>
+                    <div class="arrow">→</div>
+                    <div class="step" id="dec-step-2">2. KMS Decrypt</div>
+                    <div class="arrow">→</div>
+                    <div class="step" id="dec-step-3">3. Plaintext Returned</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Decryption Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>KMS Endpoint</h3>
+                        <code id="dec-kms-endpoint">-</code>
+                    </div>
+                    <div class="metric-card">
+                        <h3>KMS Key ID</h3>
+                        <code id="dec-kms-key">-</code>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Decryption Time</h3>
+                        <span id="dec-time" class="metric-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Data</h2>
+                <div class="data-grid">
+                    <div class="data-card">
+                        <h3>Decrypted Response</h3>
+                        <pre id="decrypted-data">Complete Phase 1 and decrypt to see data...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
