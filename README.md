@@ -9,8 +9,8 @@ This is a 3 step process:
 
 We're demonstrating a way to implement end-to-end encryption with practically any back-end service, KMS is just used as an example.
 
-And it's asy as 1. 2. 3.!
--
+**And it's asy as 1-2-3!**
+
 ## A word of caution
 
 While we follow best practices all the way, the logger is used to demo what is happening and **logs in plain-text** - because it's a demo and we want to show what's happening in the background - if you EVER want to reuse any of this code know that this code as-is, is NOT in any sense meant for actual use or even production.
