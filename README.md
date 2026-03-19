@@ -1,6 +1,6 @@
 # FIPS-140 Field Encryption Demo
 
-##TL:DR
+## TL:DR
 
 This is a 3 step process:
 1. Phase 1: Demonstrates field-level encryption via AWS KMS, transparent to the app. NGINX intercepts requests, encrypts sensitive fields before they are sent to the backend.
