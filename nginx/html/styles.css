@@ -1,0 +1,64 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; }
+.container { max-width: 1600px; margin: 0 auto; }
+h1 { color: #333; margin-bottom: 30px; text-align: center; }
+h2 { color: #555; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 8px; }
+
+.section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+/* Phase blocks */
+.phase-block { border: 2px solid #dee2e6; border-radius: 10px; padding: 16px; margin-bottom: 20px; background: #fafafa; }
+.phase-header { font-size: 18px; font-weight: 700; padding: 8px 16px; border-radius: 6px; margin-bottom: 16px; display: inline-block; }
+.phase-1-header { background: #cce5ff; color: #004085; }
+.phase-2-header { background: #d4edda; color: #155724; }
+
+/* Key flush block */
+.flush-block { background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin-bottom: 20px; text-align: center; }
+.flush-label { font-size: 18px; font-weight: 700; color: #856404; margin-bottom: 8px; }
+.flush-desc { color: #666; margin-bottom: 16px; font-size: 14px; }
+.flush-btn { background: #ffc107; color: #212529; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: 600; }
+.flush-btn:hover:not(:disabled) { background: #e0a800; }
+.flush-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.flush-status { margin-top: 12px; font-weight: 600; min-height: 24px; }
+.flush-status.success { color: #155724; }
+.flush-status.error { color: #721c24; }
+
+/* Form */
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; color: #666; font-weight: 500; }
+input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: inherit; }
+textarea { resize: vertical; font-family: 'Courier New', monospace; font-size: 12px; }
+button[type="submit"], #decrypt-btn { background: #007bff; color: white; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: 500; }
+button[type="submit"]:hover, #decrypt-btn:hover:not(:disabled) { background: #0056b3; }
+#decrypt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.phase2-desc { color: #666; font-size: 14px; margin-bottom: 16px; }
+
+/* Flow diagram */
+.flow-diagram { display: flex; align-items: center; justify-content: flex-start; gap: 10px; }
+.step { flex: 1; max-width: 220px; padding: 15px; background: #e9ecef; border-radius: 6px; text-align: center; font-size: 13px; transition: all 0.3s; }
+.step.active { background: #007bff; color: white; transform: scale(1.05); }
+.step.completed { background: #28a745; color: white; }
+.arrow { font-size: 20px; color: #999; }
+
+/* Metrics */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+.metric-card { padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #007bff; }
+.metric-card h3 { font-size: 14px; color: #666; margin-bottom: 8px; }
+.metric-value { font-size: 24px; font-weight: bold; color: #007bff; }
+code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-size: 11px; color: #e83e8c; word-break: break-all; }
+
+/* Data */
+.data-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.data-card { padding: 15px; background: #f8f9fa; border-radius: 6px; }
+.data-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+pre { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 4px; overflow-x: auto; font-size: 12px; line-height: 1.5; font-family: 'Courier New', monospace; white-space: pre-wrap; word-break: break-all; }
+
+.error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; border-left: 4px solid #dc3545; margin-bottom: 16px; }
+
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    .flow-diagram { flex-direction: column; }
+    .arrow { transform: rotate(90deg); }
+    .metrics-grid { grid-template-columns: 1fr; }
+}

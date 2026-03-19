@@ -1,0 +1,62 @@
+# docker-compose.yml
+# One-command startup: docker-compose up
+#
+# Required environment variables (set in your shell before running):
+#   AWS_ACCESS_KEY_ID     - Your AWS access key ID
+#   AWS_SECRET_ACCESS_KEY - Your AWS secret access key
+#
+# Optional:
+#   AWS_SESSION_TOKEN     - Required if using temporary credentials (e.g., assumed role)
+#
+# Example:
+#   export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+#   export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+#   docker-compose up
+
+services:
+
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - kms-bridge
+    environment:
+      - KMS_BRIDGE_URL=http://kms-bridge:5001
+    volumes:
+      - ./nginx/lua:/usr/local/openresty/nginx/lua:ro
+      - ./nginx/html:/usr/local/openresty/nginx/html:ro
+      - ./config.yaml:/etc/nginx/config.yaml:ro
+    networks:
+      - demo-net
+
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    expose:
+      - "5000"
+    networks:
+      - demo-net
+
+  kms-bridge:
+    build:
+      context: backend
+      dockerfile: Dockerfile.bridge
+    expose:
+      - "5001"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
+    volumes:
+      - ./config.yaml:/etc/nginx/config.yaml:ro
+    networks:
+      - demo-net
+
+networks:
+  demo-net:
+    driver: bridge

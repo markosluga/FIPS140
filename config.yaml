@@ -1,0 +1,8 @@
+kms:
+  region: us-east-1
+  key_id: alias/demo-field-encryption
+
+encryption:
+  fields:
+    - path: $.credit_card
+      description: Credit Card Number
