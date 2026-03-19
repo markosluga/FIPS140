@@ -1,0 +1,38 @@
+# Kiro IDE files
+.kiro/
+
+# AWS credentials and sensitive files
+.env
+*.pem
+*.key
+aws-credentials.txt
+
+# Docker volumes and logs
+docker-compose.override.yml
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node.js (if used)
+node_modules/
+npm-debug.log*
+
+# Kiro
+.kiro/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
