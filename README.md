@@ -1,5 +1,8 @@
 # FIPS-140 Field Encryption Demo
 
+> **Branch: `main` — local development**
+> This branch is for running the demo locally with Docker Compose. If you want to deploy on EC2 instead, see the [`deploy-on-ec2`](../../tree/deploy-on-ec2) branch.
+
 ## TL:DR
 
 This is a 3 step process:
