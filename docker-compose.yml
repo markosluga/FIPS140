@@ -13,33 +13,13 @@
 #   export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 #   docker-compose up
 #
-# ---------------------------------------------------------------------------
-# NGINX implementation choice
-# ---------------------------------------------------------------------------
-# This file uses the njs (NGINX JavaScript) implementation.
-#
-#   nginx/Dockerfile.njs  — standard nginx:alpine + ngx_http_js_module
-#                           scripting via nginx/js/encryption_module.js
-#
-# A functionally equivalent Lua implementation is also available:
-#
-#   nginx/Dockerfile.lua  — openresty:alpine + lua-resty-http
-#                           scripting via nginx/lua/encryption_module.lua
-#
-# To switch to the Lua version, change the nginx service below:
-#   dockerfile: Dockerfile.lua
-#   volumes:
-#     - ./nginx/lua:/usr/local/openresty/nginx/lua:ro
-#     - ./nginx/html:/usr/local/openresty/nginx/html:ro
-#     - ./config.yaml:/etc/nginx/config.yaml:ro
-# ---------------------------------------------------------------------------
 
 services:
 
   nginx:
     build:
       context: nginx
-      dockerfile: Dockerfile.njs        # switch to Dockerfile.lua for the OpenResty/Lua version
+      dockerfile: Dockerfile.njs
     ports:
       - "80:80"
     depends_on:
@@ -48,7 +28,7 @@ services:
     environment:
       - KMS_BRIDGE_URL=http://kms-bridge:5001
     volumes:
-      - ./nginx/js:/etc/nginx/js:ro                  # njs modules (switch to lua/ path for Lua version)
+      - ./nginx/js:/etc/nginx/js:ro
       - ./nginx/html:/usr/share/nginx/html:ro         # static Web UI
       - ./config.yaml:/etc/nginx/config.yaml:ro
     networks:
