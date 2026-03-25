@@ -67,3 +67,23 @@ Browser → NGINX (encrypt) → Backend → NGINX (decrypt) → Browser
 | nginx       | 80   | Encryption proxy + Web UI   |
 | backend     | 5000 | Echo API                    |
 | kms-bridge  | 5001 | AWS KMS HTTP bridge         |
+
+## NGINX implementation
+
+The default implementation uses **njs (NGINX JavaScript)** — the `ngx_http_js_module` module bundled with standard `nginx:alpine`. The encryption logic lives in `nginx/js/encryption_module.js` and is loaded via `nginx/Dockerfile.njs`.
+
+A functionally equivalent **Lua** implementation is also included, using OpenResty (`openresty:alpine`) and `lua-resty-http`. The logic lives in `nginx/lua/encryption_module.lua` and is loaded via `nginx/Dockerfile.lua`.
+
+To switch to the Lua implementation, edit `docker-compose.yml` and change the nginx service's `dockerfile` and `volumes`:
+
+```yaml
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile.lua        # was: Dockerfile.njs
+    ...
+    volumes:
+      - ./nginx/lua:/usr/local/openresty/nginx/lua:ro     # was: ./nginx/js:/etc/nginx/js:ro
+      - ./nginx/html:/usr/local/openresty/nginx/html:ro   # was: ./nginx/html:/usr/share/nginx/html:ro
+      - ./config.yaml:/etc/nginx/config.yaml:ro
+```
