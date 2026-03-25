@@ -225,7 +225,7 @@ async function proxyAndEncrypt(r) {
 
     const method = r.method;
     const contentType = r.headersIn['Content-Type'] || '';
-    let body = r.requestBody;
+    let body = r.requestText;
     let encryptMetrics = null;
     let encryptedPayload = null;
 
@@ -352,7 +352,7 @@ async function proxyAndEncrypt(r) {
     }
 
     // Pass through response headers and body unchanged
-    backendRes.headers.forEach((value, name) => {
+    backendRes.headers.forEach((name, value) => {
         const lower = name.toLowerCase();
         if (lower !== 'transfer-encoding' && lower !== 'connection') {
             r.headersOut[name] = value;
@@ -372,7 +372,7 @@ async function decryptHandler(r) {
         return;
     }
 
-    const body = await r.requestText();
+    const body = r.requestText;
     if (!body) {
         r.headersOut['Content-Type'] = 'application/json';
         r.return(400, JSON.stringify({ error: 'No body' }));
