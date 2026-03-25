@@ -68,9 +68,11 @@ Browser → NGINX (encrypt) → Backend → NGINX (decrypt) → Browser
 | backend     | 5000 | Echo API                    |
 | kms-bridge  | 5001 | AWS KMS HTTP bridge         |
 
-## NGINX implementation
+## NGINX implementation in njs (default)
 
 The default implementation uses **njs (NGINX JavaScript)** — the `ngx_http_js_module` module bundled with standard `nginx:alpine`. The encryption logic lives in `nginx/js/encryption_module.js` and is loaded via `nginx/Dockerfile.njs`.
+
+## NGINX implementation in Lua
 
 A functionally equivalent **Lua** implementation is also included, using OpenResty (`openresty:alpine`) and `lua-resty-http`. The logic lives in `nginx/lua/encryption_module.lua` and is loaded via `nginx/Dockerfile.lua`.
 
