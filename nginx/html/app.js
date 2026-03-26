@@ -31,7 +31,6 @@ document.getElementById('encrypt-form').addEventListener('submit', async (e) => 
             if (storedCiphertext) {
                 document.getElementById('ciphertext-input').value = storedCiphertext;
                 document.getElementById('decrypt-btn').disabled = false;
-                document.getElementById('flush-btn').disabled = false;
             }
 
             document.getElementById('enc-kms-endpoint').textContent = metrics.kms_endpoint || '-';
@@ -55,30 +54,6 @@ document.getElementById('encrypt-form').addEventListener('submit', async (e) => 
             document.getElementById('encrypted-data').textContent = 'Error: ' + err.message;
         }
     });
-});
-
-// Key cache flush
-document.getElementById('flush-btn').addEventListener('click', async () => {
-    const btn = document.getElementById('flush-btn');
-    const status = document.getElementById('flush-status');
-    btn.disabled = true;
-    status.textContent = 'Flushing...';
-    status.className = 'flush-status';
-
-    try {
-        const response = await fetch('/api/flush-cache', { method: 'POST' });
-        if (response.ok) {
-            status.textContent = '✅ Key cache flushed — next operation will re-request keys from AWS KMS';
-            status.className = 'flush-status success';
-        } else {
-            // kms-bridge may not have a flush endpoint — treat as success for demo
-            status.textContent = '✅ Key cache flushed (simulated)';
-            status.className = 'flush-status success';
-        }
-    } catch (err) {
-        status.textContent = '✅ Key cache flushed (simulated)';
-        status.className = 'flush-status success';
-    }
 });
 
 // Phase 2: Decrypt
