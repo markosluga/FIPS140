@@ -40,7 +40,7 @@ aws kms create-alias --alias-name alias/demo-field-encryption --target-key-id $K
 ## Run
 
 ```bash
-docker-compose up
+docker-compose up -d
 ```
 
 Open [http://localhost](http://localhost).
