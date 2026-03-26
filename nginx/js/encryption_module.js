@@ -297,14 +297,17 @@ async function envelopeEncrypt(plaintext) {
     );
     const ct     = new Uint8Array(ctBuf);
 
-    // 3. Zero DEK (best-effort in JS)
+    // 3. Capture fingerprint (first 8 bytes as hex) before zeroing
+    const dekFp = Array.from(dekBytes.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // 4. Zero DEK (best-effort in JS)
     dekBytes.fill(0);
 
-    // 4. Pack self-contained envelope: version + EDK + IV + ciphertext
+    // 5. Pack self-contained envelope: version + EDK + IV + ciphertext
     const envelope   = JSON.stringify({ v: 1, edk, iv: b64encode(iv), ct: b64encode(ct) });
     const ciphertext = 'ENC_V1_' + b64encode(new TextEncoder().encode(envelope));
 
-    return { ciphertext, cmkId, durationMs: Date.now() - t0 };
+    return { ciphertext, cmkId, dekFp, durationMs: Date.now() - t0 };
 }
 
 // ---------------------------------------------------------------------------
@@ -340,10 +343,13 @@ async function envelopeDecrypt(ciphertext) {
     );
     const plaintext = new TextDecoder().decode(plainBuf);
 
-    // 3. Zero DEK
+    // 3. Capture fingerprint (first 8 bytes as hex) before zeroing
+    const dekFp = Array.from(dekBytes.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // 4. Zero DEK
     dekBytes.fill(0);
 
-    return { plaintext, cmkId, durationMs: Date.now() - t0 };
+    return { plaintext, cmkId, dekFp, durationMs: Date.now() - t0 };
 }
 
 // ---------------------------------------------------------------------------
@@ -423,7 +429,7 @@ async function proxyAndEncrypt(r) {
             kms_endpoint:     'https://kms.' + config.kms.region + '.amazonaws.com/',
             kms_region:       config.kms.region,
             kms_key_id:       (lastResult && lastResult.cmkId) || config.kms.key_id,
-            data_key_id:      null,
+            data_key_id:      lastResult ? 'AES-256-GCM · fp:' + lastResult.dekFp : 'AES-256-GCM (ephemeral)',
         };
     }
 
@@ -517,6 +523,7 @@ async function decryptHandler(r) {
     const decrypted = {};
     let totalMs = 0;
     let lastCmkId = null;
+    let lastDekFp = null;
 
     const keys = Object.keys(data);
     for (let ki = 0; ki < keys.length; ki++) {
@@ -527,6 +534,7 @@ async function decryptHandler(r) {
                 decrypted[k]  = result.plaintext;
                 totalMs      += result.durationMs || 0;
                 lastCmkId     = result.cmkId;
+                lastDekFp     = result.dekFp;
             } catch (e) {
                 ngx.log(ngx.ERR, 'Decrypt failed for field ' + k + ': ' + e.message);
                 decrypted[k] = v; // preserve ciphertext on error
@@ -543,7 +551,7 @@ async function decryptHandler(r) {
             kms_endpoint:    'https://kms.' + config.kms.region + '.amazonaws.com/',
             kms_region:      config.kms.region,
             kms_key_id:      lastCmkId || config.kms.key_id,
-            data_key_id:     null,
+            data_key_id:     lastDekFp ? 'AES-256-GCM · fp:' + lastDekFp : 'AES-256-GCM (ephemeral)',
             decrypt_time_ms: totalMs,
         },
     }));
