@@ -295,6 +295,7 @@ async function proxyAndEncrypt(r) {
                 ('https://kms.' + config.kms.region + '.amazonaws.com/'),
             kms_region: config.kms.region,
             kms_key_id: (lastResult && lastResult.key_id) || config.kms.key_id,
+            data_key_id: (lastResult && lastResult.data_key_id) || null,
         };
     }
 
@@ -338,6 +339,7 @@ async function proxyAndEncrypt(r) {
                     kms_endpoint:    encryptMetrics.kms_endpoint,
                     kms_region:      encryptMetrics.kms_region,
                     kms_key_id:      encryptMetrics.kms_key_id,
+                    data_key_id:     encryptMetrics.data_key_id || null,
                     encrypt_time_ms: encryptMetrics.encrypt_time_ms || 0,
                     decrypt_time_ms: 0,
                     fields_encrypted: encryptMetrics.fields_encrypted || [],
@@ -395,7 +397,7 @@ async function decryptHandler(r) {
     const keys = Object.keys(data);
     for (let ki = 0; ki < keys.length; ki++) {
         const k = keys[ki], v = data[k];
-        if (typeof v === 'string' && v.startsWith('AQICA')) {
+        if (typeof v === 'string' && v.startsWith('ENC_V1_')) {
             try {
                 const res = await callKmsBridge('/decrypt', { ciphertext: v });
                 decrypted[k] = res.plaintext;
@@ -417,6 +419,7 @@ async function decryptHandler(r) {
                 ('https://kms.' + config.kms.region + '.amazonaws.com/'),
             kms_region:      config.kms.region,
             kms_key_id:      (lastMeta && lastMeta.key_id) || config.kms.key_id,
+            data_key_id:     (lastMeta && lastMeta.data_key_id) || null,
             decrypt_time_ms: totalMs,
         },
     };

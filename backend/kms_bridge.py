@@ -201,7 +201,7 @@ def encrypt():
 
         logger.info(f"[ENCRYPT] Encrypting field (length={len(plaintext)})")
         result = kms_client.encrypt(plaintext, key_id)
-        logger.info(f"[ENCRYPTED] Duration: {result['duration_ms']}ms, Key: {result['key_id']}")
+        logger.info(f"[ENCRYPTED] Duration: {result['duration_ms']}ms, CMK: {result['key_id']}, DEK: {result['data_key_id']}")
 
         return jsonify(result), 200
 
@@ -229,7 +229,7 @@ def decrypt():
 
         logger.info(f"[DECRYPT] Decrypting field (length={len(ciphertext)})")
         result = kms_client.decrypt(ciphertext)
-        logger.info(f"[DECRYPTED] Duration: {result['duration_ms']}ms, Value: {result['plaintext'][:20]}...")
+        logger.info(f"[DECRYPTED] Duration: {result['duration_ms']}ms, CMK: {result['key_id']}, DEK: {result['data_key_id']}, Value: {result['plaintext'][:20]}...")
 
         return jsonify(result), 200
 

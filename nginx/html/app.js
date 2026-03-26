@@ -36,6 +36,7 @@ document.getElementById('encrypt-form').addEventListener('submit', async (e) => 
 
             document.getElementById('enc-kms-endpoint').textContent = metrics.kms_endpoint || '-';
             document.getElementById('enc-kms-key').textContent = metrics.kms_key_id || '-';
+            document.getElementById('enc-data-key').textContent = metrics.data_key_id || '-';
             animateValue('enc-time', metrics.encrypt_time_ms != null ? metrics.encrypt_time_ms + 'ms' : '-');
 
         } catch (err) {
@@ -93,6 +94,7 @@ document.getElementById('decrypt-btn').addEventListener('click', async () => {
             document.getElementById('decrypted-data').textContent = JSON.stringify(decrypted, null, 2);
             document.getElementById('dec-kms-endpoint').textContent = metrics.kms_endpoint || '-';
             document.getElementById('dec-kms-key').textContent = metrics.kms_key_id || '-';
+            document.getElementById('dec-data-key').textContent = metrics.data_key_id || '-';
             animateValue('dec-time', metrics.decrypt_time_ms != null ? metrics.decrypt_time_ms + 'ms' : '-');
 
         } catch (err) {
