@@ -39,6 +39,17 @@ document.getElementById('encrypt-form').addEventListener('submit', async (e) => 
             document.getElementById('enc-data-key').textContent = metrics.data_key_id || '-';
             animateValue('enc-time', metrics.encrypt_time_ms != null ? metrics.encrypt_time_ms + 'ms' : '-');
 
+            // Decode and display envelope contents
+            if (storedCiphertext && storedCiphertext.startsWith('ENC_V1_')) {
+                try {
+                    const envelope = JSON.parse(atob(storedCiphertext.slice(7)));
+                    document.getElementById('env-edk').textContent = envelope.edk || '-';
+                    document.getElementById('env-iv').textContent  = envelope.iv  || '-';
+                    document.getElementById('env-ct').textContent  = envelope.ct  || '-';
+                    document.getElementById('envelope-section').style.display = '';
+                } catch (_) {}
+            }
+
         } catch (err) {
             showError(err.message);
             document.getElementById('encrypted-data').textContent = 'Error: ' + err.message;

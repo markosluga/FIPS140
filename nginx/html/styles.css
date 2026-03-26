@@ -62,3 +62,7 @@ pre { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 4px; ov
     .arrow { transform: rotate(90deg); }
     .metrics-grid { grid-template-columns: 1fr; }
 }
+
+/* Envelope */
+.envelope-grid { grid-template-columns: 1fr; gap: 15px; }
+.envelope-label { font-size: 12px; color: #888; margin: 0 0 8px; }

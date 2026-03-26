@@ -70,6 +70,28 @@
                     </div>
                 </div>
             </div>
+
+            <div class="section" id="envelope-section" style="display:none">
+                <h2>Envelope Contents</h2>
+                <p class="phase2-desc">The ciphertext is a self-contained envelope. The EDK travels with the data — no separate key retrieval needed to decrypt.</p>
+                <div class="data-grid envelope-grid">
+                    <div class="data-card">
+                        <h3>EDK — Encrypted Data Key</h3>
+                        <p class="envelope-label">DEK wrapped by KMS (CMK). Sent back to KMS on decrypt to recover the DEK.</p>
+                        <pre id="env-edk">-</pre>
+                    </div>
+                    <div class="data-card">
+                        <h3>IV — Nonce</h3>
+                        <p class="envelope-label">Random 12-byte AES-GCM nonce. Unique per encryption, never reused.</p>
+                        <pre id="env-iv">-</pre>
+                    </div>
+                    <div class="data-card">
+                        <h3>CT — Ciphertext</h3>
+                        <p class="envelope-label">AES-256-GCM ciphertext of the actual field value. Useless without the DEK.</p>
+                        <pre id="env-ct">-</pre>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Key Flush -->
