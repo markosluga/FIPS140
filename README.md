@@ -3,24 +3,25 @@
 > **Local development**
 > This repo is for running the demo locally with Docker Compose. To deploy on EC2 instead, see [markosluga/FIPS140-ec2](https://github.com/markosluga/FIPS140-ec2).
 
-## TL:DR
+## TL;DR
 
-This is a 2 step process:
-1. Phase 1: Demonstrates field-level encryption via AWS KMS, transparent to the app. NGINX intercepts requests, encrypts sensitive fields before they are sent to the backend.
-2. Phase 2: Back-end retrieves the key from KMS and decrypts.
+This is a 2-step process:
 
-We're demonstrating a way to implement end-to-end encryption with practically any back-end service, KMS is just used as an example.
+1. **Phase 1:** NGINX intercepts the request, signs and calls AWS KMS directly to generate an ephemeral data key (DEK), encrypts the sensitive field with AES-256-GCM using the WebCrypto API, and forwards only the ciphertext envelope to the backend. The DEK never leaves NGINX memory.
+2. **Phase 2:** The backend receives the encrypted payload, calls KMS directly to decrypt the envelope, and logs the recovered plaintext — demonstrating the full round-trip.
+
+This demonstrates a way to implement transparent field-level encryption in front of practically any backend service, with NGINX doing all the crypto work inline — no sidecar, no proxy, no extra hop.
 
 **And it's as easy as 1-2!**
 
 ## A word of caution
 
-While we follow best practices all the way, the logger is used to demo what is happening and **logs in plain-text** - because it's a demo and we want to show what's happening in the background - if you EVER want to reuse any of this code know that this code as-is, is NOT in any sense meant for actual use or even production.
+While we follow best practices all the way, the logger is used to demo what is happening and **logs in plain-text** — because it's a demo and we want to show what's happening in the background. If you ever want to reuse any of this code, know that this code as-is is NOT meant for actual production use.
 
 ## Prerequisites
 
 - Docker + Docker Compose
-- AWS credentials with KMS access
+- AWS credentials with KMS access (`kms:GenerateDataKey`, `kms:Decrypt`, `kms:DescribeKey`)
 
 ## Setup
 
@@ -50,22 +51,70 @@ Open [http://localhost](http://localhost).
 1. **Phase 1** — enter a credit card number and click Encrypt. Use any [Stripe test card](https://docs.stripe.com/testing) e.g. `4242 4242 4242 4242`.
 2. **Phase 2** — click Decrypt to retrieve the plaintext via KMS.
 
+---
+
 ## Architecture
 
 ```
-Browser → NGINX (encrypt) → Backend → NGINX (decrypt) → Browser
-                ↕                           ↕
-           KMS Bridge                  KMS Bridge
-                ↕                           ↕
-            AWS KMS                     AWS KMS
+Browser → NGINX (SigV4 + WebCrypto) → Backend (KMS direct) → Browser
+                    ↕                          ↕
+               AWS KMS                     AWS KMS
 ```
 
-| Service     | Port | Role                                        |
-|-------------|------|---------------------------------------------|
-| nginx       | 80   | Encryption proxy + Web UI                   |
-| backend     | 5000 | Echo API                                    |
-| kms-bridge  | 5001 | AWS KMS HTTP bridge with encryption support |
+| Service  | Port | Role                                                    |
+|----------|------|---------------------------------------------------------|
+| nginx    | 80   | Encryption proxy + Web UI — calls KMS directly via njs  |
+| backend  | 5000 | Receives encrypted payload, decrypts via KMS, echoes back |
 
-## NGINX implementation
+## How encryption works
 
-Uses **njs (NGINX JavaScript)** — the `ngx_http_js_module` module bundled with standard `nginx:alpine`. The encryption logic lives in `nginx/js/encryption_module.js` and is loaded via `nginx/Dockerfile.njs`.
+NGINX handles the full encrypt/decrypt path inline using two standard APIs — no sidecar process required:
+
+**Encrypt (Phase 1):**
+1. NGINX intercepts the POST request
+2. njs calls `KMS.GenerateDataKey` directly, signed with **AWS SigV4** (implemented in `crypto.subtle` HMAC-SHA256)
+3. njs encrypts the field locally with **AES-256-GCM** via the WebCrypto API (`crypto.subtle.encrypt`)
+4. The plaintext DEK is zeroed immediately after use
+5. The ciphertext envelope (`ENC_V1_...`) — containing the encrypted DEK, IV, and ciphertext — is forwarded to the backend in place of the plaintext value
+
+**Decrypt (Phase 2):**
+1. The frontend sends the stored ciphertext back to NGINX `/api/decrypt`
+2. njs unpacks the envelope, sends the encrypted DEK to `KMS.Decrypt`
+3. njs decrypts locally with AES-256-GCM and returns the plaintext
+
+**Backend:**
+The Flask backend receives the encrypted payload, calls `KMS.Decrypt` directly using `kms_client.py`, logs the recovered plaintext, and echoes the decrypted data back — demonstrating the full server-side flow independently of NGINX.
+
+## Envelope format
+
+Each encrypted field is a self-contained envelope:
+
+```
+ENC_V1_<base64(JSON)>
+```
+
+Where the JSON contains:
+```json
+{
+  "v": 1,
+  "edk": "<base64 — encrypted DEK, unwrapped by KMS on decrypt>",
+  "iv":  "<base64 — 12-byte random nonce>",
+  "ct":  "<base64 — AES-256-GCM ciphertext + auth tag>"
+}
+```
+
+The envelope is portable — decryption only needs the envelope itself and KMS access. No separate key lookup required.
+
+## IAM permissions required
+
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "kms:GenerateDataKey",
+    "kms:Decrypt",
+    "kms:DescribeKey"
+  ],
+  "Resource": "*"
+}
+```

@@ -1,7 +1,7 @@
 FROM nginx:alpine
 
 # Install njs (NGINX JavaScript) module
-RUN apk add --no-cache nginx-module-njs
+RUN apk add --no-cache nginx-module-njs ca-certificates
 
 # Copy NGINX configuration (njs version)
 COPY nginx.njs.conf /etc/nginx/nginx.conf

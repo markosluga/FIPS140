@@ -24,9 +24,10 @@ services:
       - "80:80"
     depends_on:
       - backend
-      - kms-bridge
     environment:
-      - KMS_BRIDGE_URL=http://kms-bridge:5001
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
     volumes:
       - ./nginx/js:/etc/nginx/js:ro
       - ./nginx/html:/usr/share/nginx/html:ro         # static Web UI
@@ -40,21 +41,12 @@ services:
       dockerfile: Dockerfile
     expose:
       - "5000"
-    networks:
-      - demo-net
-
-  kms-bridge:
-    build:
-      context: backend
-      dockerfile: Dockerfile.bridge
-    expose:
-      - "5001"
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
-    volumes:
-      - ./config.yaml:/etc/nginx/config.yaml:ro
+      - KMS_REGION=${KMS_REGION:-us-east-1}
+      - KMS_KEY_ID=${KMS_KEY_ID:-alias/demo-field-encryption}
     networks:
       - demo-net
 
